@@ -90,6 +90,25 @@ Rebuild after changes:
 docker-compose up -d --build
 ```
 
+## Quick Start (Docker)
+
+See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
+
+**TL;DR:**
+```bash
+git clone <repo-url> && cd price-tracker
+git checkout v1
+docker-compose up -d
+# API will be available at http://localhost:8000
+# Docs at http://localhost:8000/docs
+```
+
+**Test the API:**
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/api/v1/products/
+```
+
 ## Tech Stack
 
 | Layer | Technology | Purpose |
