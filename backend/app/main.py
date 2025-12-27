@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import get_settings
+from .api import products_router
 
 settings = get_settings()
 
 app = FastAPI(
     title=settings.API_TITLE,
     version=settings.API_VERSION,
+    description="Price Tracker API - Monitor your wishlist prices across e-commerce platforms",
 )
 
 # CORS (pour le frontend Vue)
@@ -18,6 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(products_router, prefix=settings.API_PREFIX)
+
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "version": settings.API_VERSION}
@@ -28,4 +33,5 @@ def root():
         "message": "Price Tracker API",
         "version": settings.API_VERSION,
         "docs": "/docs",
+        "health": "/health",
     }
