@@ -14,7 +14,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright browsers (for future scraping)
-RUN playwright install --with-deps chromium
+# Note: --with-deps disabled for now, will be added in Phase D when implementing scraping
+RUN playwright install chromium
 
 # Copy application code
 COPY . .
