@@ -8,6 +8,7 @@ from .base import (
 from .engine import ParserEngine, parser_engine
 from .generic_parser import GenericParser
 from .amazon_parser import AmazonParser
+from .fr_sites_parsers import CdiscountParser, FnacParser, BoulangerParser
 from . import extractors
 
 __all__ = [
@@ -20,5 +21,8 @@ __all__ = [
     "parser_engine",
     "GenericParser",
     "AmazonParser",
+    "CdiscountParser",
+    "FnacParser",
+    "BoulangerParser",
     "extractors",
 ]
