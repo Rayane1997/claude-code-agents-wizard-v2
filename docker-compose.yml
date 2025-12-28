@@ -55,6 +55,50 @@ services:
         condition: service_healthy
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
+  # Celery Worker
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pricetracker-worker
+    environment:
+      DATABASE_URL: postgresql://pricetracker:pricetracker@postgres:5432/pricetracker
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+    command: celery -A app.workers.celery_app worker --loglevel=info
+
+  # Celery Beat Scheduler
+  beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pricetracker-beat
+    environment:
+      DATABASE_URL: postgresql://pricetracker:pricetracker@postgres:5432/pricetracker
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      worker:
+        condition: service_started
+    command: celery -A app.workers.celery_app beat --loglevel=info
+
 volumes:
   postgres_data:
   redis_data:
