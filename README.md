@@ -69,9 +69,9 @@ docker-compose up -d
 ```
 
 4. Access the application:
-- Frontend: http://localhost:5173
-- API Docs: http://localhost:8000/docs
-- API Health: http://localhost:8000/health
+- Frontend: http://localhost:5173 (Phase N - not implemented yet)
+- API Docs: http://localhost:8001/docs
+- API Health: http://localhost:8001/health
 
 ### Development
 
@@ -99,14 +99,14 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed instructions.
 git clone <repo-url> && cd price-tracker
 git checkout v1
 docker-compose up -d
-# API will be available at http://localhost:8000
-# Docs at http://localhost:8000/docs
+# API will be available at http://localhost:8001
+# Docs at http://localhost:8001/docs
 ```
 
 **Test the API:**
 ```bash
-curl http://localhost:8000/health
-curl http://localhost:8000/api/v1/products/
+curl http://localhost:8001/health
+curl http://localhost:8001/api/v1/products/
 ```
 
 ## Tech Stack
@@ -133,47 +133,44 @@ curl http://localhost:8000/api/v1/products/
 - `v1`: Active development branch (MVP features)
 - Feature branches: `feature/<name>` merged into `v1`
 
-## Roadmap (MVP)
+## Development Status
 
-### Phase A: Repository Initialization
-- [x] Git repository setup
+**🟢 Completed (4/25 phases)** - API fully functional!
+
+### ✅ Phase A: Repository Initialization
+- [x] Git repository setup (main + v1 branches)
 - [x] Project structure
 - [x] Documentation files
 
-### Phase B: Backend Foundation
-- [ ] FastAPI application skeleton
-- [ ] Database models (Product, PriceHistory, Alert)
-- [ ] Basic CRUD endpoints
-- [ ] PostgreSQL integration with Alembic
+### ✅ Phase B: Backend Foundation
+- [x] FastAPI application skeleton
+- [x] Database models (Product, PriceHistory, Alert, ParserConfig)
+- [x] PostgreSQL integration with Alembic
+- [x] Complete configuration system
 
-### Phase C: Parser Engine
-- [ ] Generic parser architecture
-- [ ] Domain-specific configurations (JSON/YAML)
-- [ ] Playwright integration
-- [ ] BeautifulSoup fallback
+### ✅ Phase C: CRUD API Endpoints
+- [x] Pydantic schemas with validation
+- [x] 6 REST endpoints (list, get, create, update, delete, domains)
+- [x] Pagination + filtering + sorting
+- [x] API tested and working
 
-### Phase D: Celery Workers
-- [ ] Celery configuration
-- [ ] Scraping tasks
-- [ ] Periodic scheduling (Celery Beat)
-- [ ] Error handling and retries
+### ✅ Phase T: Docker Compose (Minimal)
+- [x] PostgreSQL 16 + Redis 7 + FastAPI services
+- [x] Auto-migration on startup
+- [x] Health checks
+- [x] Complete deployment guide
 
-### Phase E: Frontend Application
-- [ ] Vue 3 project setup with Vite
-- [ ] TailwindCSS configuration
-- [ ] Product listing and detail views
-- [ ] Price history charts
-- [ ] Wishlist management UI
+### 🟡 Next: Phase D-M (Backend Completion)
+- [ ] Generic parser engine (Phase D)
+- [ ] Site-specific parsers (Phase E-G)
+- [ ] Parser admin API (Phase H)
+- [ ] Celery workers + scheduler (Phase I-J)
+- [ ] Price history API (Phase K)
+- [ ] Promo detection (Phase L)
+- [ ] Alert system (Phase M)
 
-### Phase F: Integration & Testing
-- [ ] API integration
-- [ ] End-to-end testing
-- [ ] Performance optimization
-
-### Phase G: Deployment
-- [ ] Docker Compose production configuration
-- [ ] VPS deployment guide
-- [ ] Backup and monitoring setup
+### Remaining Phases (21/25)
+See [CHANGELOG.md](CHANGELOG.md) for detailed breakdown of all phases.
 
 ## Contributing
 
