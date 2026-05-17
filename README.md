@@ -1,6 +1,6 @@
 # Claude Code Agent Orchestration System v2 🚀
 
-A simple yet powerful orchestration system for Claude Code that uses specialized agents to manage complex projects from start to finish, with mandatory human oversight and visual testing.
+A simple yet powerful orchestration system for Claude Code that uses specialized agents to manage complex projects from start to finish, with mandatory human oversight, security review, and visual testing.
 
 ## 🎯 What Is This?
 
@@ -8,15 +8,18 @@ This is a **custom Claude Code orchestration system** that transforms how you bu
 
 - **🧠 Claude (You)** - The orchestrator with 200k context managing todos and the big picture
 - **✍️ Coder Subagent** - Implements one todo at a time in its own clean context
+- **🔐 Cybersecurity Subagent** - Reviews implementations for OWASP risks, exposed secrets, and insecure patterns
 - **👁️ Tester Subagent** - Verifies implementations using Playwright in its own context
 - **🆘 Stuck Subagent** - Human escalation point when ANY problem occurs
 
 ## ⚡ Key Features
 
 - **No Fallbacks**: When ANY agent hits a problem, you get asked - no assumptions, no workarounds
+- **Security Reviews**: OWASP-focused security validation before testing begins
+- **Secret Detection**: Detects exposed API keys, tokens, passwords, and unsafe configs
 - **Visual Testing**: Playwright MCP integration for screenshot-based verification
 - **Todo Tracking**: Always see exactly where your project stands
-- **Simple Flow**: Claude creates todos → delegates to coder → tester verifies → repeat
+- **Secure Flow**: Claude creates todos → coder implements → cybersecurity reviews → tester verifies → repeat
 - **Human Control**: The stuck agent ensures you're always in the loop
 
 ## 🚀 Quick Start
@@ -53,10 +56,11 @@ Claude will automatically:
 1. Create a detailed todo list using TodoWrite
 2. Delegate the first todo to the **coder** subagent
 3. The coder implements in its own clean context window
-4. Delegate verification to the **tester** subagent (Playwright screenshots)
-5. If ANY problem occurs, the **stuck** subagent asks you what to do
-6. Mark todo complete and move to the next one
-7. Repeat until project complete
+4. Delegate security review to the **cybersecurity** subagent
+5. Delegate verification to the **tester** subagent (Playwright screenshots)
+6. If ANY problem occurs, the **stuck** subagent asks you what to do
+7. Mark todo complete and move to the next one
+8. Repeat until project complete
 
 ### The Workflow
 
@@ -72,6 +76,14 @@ CODER (own context): Implements feature
     ├─→ Problem? → Invokes STUCK → You decide → Continue
     ↓
 CODER: Reports completion
+    ↓
+CLAUDE: Invokes cybersecurity subagent
+    ↓
+CYBERSECURITY (own context): Reviews OWASP risks, secrets, unsafe configs
+    ↓
+    ├─→ Security issue? → Invokes STUCK → You decide → Continue
+    ↓
+CYBERSECURITY: Reports success
     ↓
 CLAUDE: Invokes tester subagent
     ↓
@@ -110,10 +122,24 @@ Repeat until all todos done ✅
 
 **When it's used**: Claude delegates each coding todo to this subagent
 
+### Cybersecurity Subagent
+**Fresh Context Per Security Review**
+
+- Gets invoked after each coder completion
+- Works in its own clean context window
+- Reviews implementations for OWASP Top 10 vulnerabilities
+- Detects exposed API keys, secrets, and tokens
+- Reviews authentication, authorization, and configurations
+- Blocks unsafe implementations before testing begins
+- **Never approves insecure implementations**
+- Reports security pass/fail back to Claude
+
+**When it's used**: Claude delegates security review after every implementation and before testing
+
 ### Tester Subagent
 **Fresh Context Per Verification**
 
-- Gets invoked after each coder completion
+- Gets invoked after cybersecurity approval
 - Works in its own clean context window
 - Uses **Playwright MCP** to see rendered output
 - Takes screenshots to verify layouts
@@ -121,12 +147,12 @@ Repeat until all todos done ✅
 - **Never marks failing tests as passing**
 - Reports pass/fail back to Claude
 
-**When it's used**: Claude delegates testing after every implementation
+**When it's used**: Claude delegates testing after every approved implementation
 
 ### Stuck Subagent
 **Fresh Context Per Problem**
 
-- Gets invoked when coder or tester hits a problem
+- Gets invoked when coder, cybersecurity, or tester hits a problem
 - Works in its own clean context window
 - **ONLY subagent** that can ask you questions
 - Presents clear options for you to choose
@@ -161,6 +187,12 @@ Claude invokes coder(todo #1: "Set up HTML structure")
 
 Coder (own context): Creates index.html
 Coder: Reports completion to Claude
+
+Claude invokes cybersecurity("Review HTML structure implementation")
+
+Cybersecurity (own context): Reviews implementation for security issues
+Cybersecurity: No OWASP or secret exposure issues found
+Cybersecurity: Reports success to Claude
 
 Claude invokes tester("Verify HTML structure loads")
 
@@ -198,12 +230,13 @@ Coder: Reports completion to Claude
 ```
 .
 ├── .claude/
-│   ├── CLAUDE.md              # Orchestration instructions for main Claude
+│   ├── CLAUDE.md                  # Orchestration instructions for main Claude
 │   └── agents/
-│       ├── coder.md          # Coder subagent definition
-│       ├── tester.md         # Tester subagent definition
-│       └── stuck.md          # Stuck subagent definition
-├── .mcp.json                  # Playwright MCP configuration
+│       ├── coder.md              # Coder subagent definition
+│       ├── cybersecurity.md      # Cybersecurity review agent definition
+│       ├── tester.md             # Tester subagent definition
+│       └── stuck.md              # Stuck subagent definition
+├── .mcp.json                      # Playwright MCP configuration
 ├── .gitignore
 └── README.md
 ```
@@ -244,6 +277,7 @@ This system leverages Claude Code's [subagent system](https://docs.claude.com/en
 The magic happens because:
 - **Claude (200k context)** = Maintains big picture, manages todos
 - **Coder (fresh context)** = Implements one task at a time
+- **Cybersecurity (fresh context)** = Reviews OWASP risks and secret exposure
 - **Tester (fresh context)** = Verifies one implementation at a time
 - **Stuck (fresh context)** = Handles one problem at a time with human input
 - **Each subagent** has specific tools and hardwired escalation rules
@@ -251,15 +285,17 @@ The magic happens because:
 ## 🎯 Best Practices
 
 1. **Trust Claude** - Let it create and manage the todo list
-2. **Review screenshots** - The tester provides visual proof of every implementation
-3. **Make decisions when asked** - The stuck agent needs your guidance
-4. **Don't interrupt the flow** - Let subagents complete their work
-5. **Check the todo list** - Always visible, tracks real progress
+2. **Review security findings** - The cybersecurity agent validates implementation safety
+3. **Review screenshots** - The tester provides visual proof of every implementation
+4. **Make decisions when asked** - The stuck agent needs your guidance
+5. **Don't interrupt the flow** - Let subagents complete their work
+6. **Check the todo list** - Always visible, tracks real progress
 
 ## 🔥 Pro Tips
 
 - Use `/agents` command to see all available subagents
 - Claude maintains the todo list in its 200k context - check anytime
+- Security reviews happen before testing begins
 - Screenshots from tester are saved and can be reviewed
 - Each subagent has specific tools - check their `.md` files
 - Subagents get fresh contexts - no context pollution!
@@ -276,4 +312,4 @@ Powered by Claude Code's agent system and Playwright MCP.
 
 ---
 
-**Ready to build something amazing?** Just run `claude` in this directory and tell it what you want to create! 🚀
+**Ready to build something amazing securely?** Just run `claude` in this directory and tell it what you want to create! 🚀
